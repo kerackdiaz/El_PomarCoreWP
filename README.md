@@ -1,10 +1,9 @@
 === El Pomar ===
 Contributors: inclup
-Donate link: https://pomar.com.co/
 Tags: ecommerce, woocommerce, products, catalog
 Requires at least: 6.0
 Tested up to: 6.6.2
-Stable tag: 1.0.1
+Stable tag: 1.0.2
 Requires PHP: 8.2
 License: GPLv2 or later
 License URI: https://www.gnu.org/licenses/gpl-2.0.html
@@ -30,6 +29,10 @@ El Pomar es un plugin de WordPress que facilita la administración de productos 
 3. Usa el elemento de menú 'El Pomar' para configurar el plugin.
 
 == Changelog ==
+= 1.0.2 =
+* Agregadas imágenes, iconos y estilos para el frontend.
+* Mejoras en la interfaz de usuario.
+
 = 1.0.1 =
 * Versión inicial del plugin.
 
@@ -38,3 +41,11 @@ El Pomar es un plugin de WordPress que facilita la administración de productos 
 = ¿Cómo puedo configurar el plugin? =
 Puedes configurar el plugin desde el menú 'El Pomar' en el panel de administración de WordPress.
 
+= ¿Es compatible con WooCommerce y Elementor? =
+Sí, el plugin es compatible con WooCommerce y Elementor.
+
+== Screenshots ==
+
+1. Pantalla de configuración del plugin.
+2. Vista del catálogo de productos.
+3. Detalles de un producto en el catálogo.
