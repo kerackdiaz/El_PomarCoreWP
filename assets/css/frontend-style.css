@@ -152,6 +152,9 @@ body {
     gap: 10px;
 }
 
+img.category-icon{
+    width: 62px;
+}
 
 .category-name {
     font-size: 25px;
@@ -241,4 +244,89 @@ div#product-benefits {
     font-weight: 600;
     color: #fff;
 
+}
+
+
+@media (max-width: 1024px) {
+
+
+    .productsContainer .tab-content{
+        flex-direction: column;
+        padding: 80px 10px;
+    }
+
+    .accordion{
+        display: grid;
+        grid-template-columns: 350px 350px;
+        grid-gap: 20px;
+    }
+
+    img.category-icon{
+        width: 62px;
+    }
+    
+    
+}
+
+@media (max-width: 767px) {
+    .nav-tabs {
+        gap: 10px;
+    }
+    .tab{
+        width:109px;
+        height: 72px;
+    }
+
+    .tab img{
+        width: 70%;
+    }
+
+    .accordion{
+        display: grid;
+        grid-template-columns: 170px 170px;
+        grid-gap: 10px;
+    }
+
+    img.category-icon{
+        width: 30px;
+    }
+
+    .category-name{
+        font-size: 10px;
+    }
+
+    img.toggle-icon {
+        width: 17px;
+    }
+
+    .accordion-content .product-link {
+        font-size: 10px;
+    }
+    .accordion-content {
+        padding-left: 10px;
+        margin-top: 5px;
+    }
+    .accordion-content ul{
+        display: flex;
+        flex-direction: column;
+        gap: 10px;
+    }
+
+    h2#product-name {
+        font-size: 20px;
+        padding: 15px 0;
+    }
+
+    .info-icon {
+        width: 40px;
+        height: 40px;
+    }
+
+    .info-icon img {
+        width: 18px;
+    }
+
+    .benefist-descrip {
+        font-size: 10px;
+    }
 }

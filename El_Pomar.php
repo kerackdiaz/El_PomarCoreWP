@@ -3,7 +3,7 @@
 * Plugin name: El Pomar
 * Plugin URL: https://pomar.com.co/
 * Description: Crea y gestiona los productos disponibles dentro del catalogo de Leches El Pomar.
-* Version: 1.0.1
+* Version: 1.1.0
 * Author: Inclup
 * Author URI: http://inclup.com/
 * License: GPLv2
@@ -20,7 +20,7 @@ if (!defined('ABSPATH')) {
 }
 
 if (!defined('EP_VERSION')) {
-    define('EP_VERSION', '1.0.1');
+    define('EP_VERSION', '1.1.0');
 }
 
 if (!defined('EP_FILE')) {
@@ -59,7 +59,7 @@ class ElPomar {
 
     // Enlace de Accion para el plugin
     public function plugin_action_links($links) {
-        $update_link = '<a href="' . esc_url(add_query_arg('lc_check_update', '1', admin_url('plugins.php'))) . '">' . __('Check for Updates', 'El Pomar') . '</a>';
+        $update_link = '<a href="' . esc_url(add_query_arg('ep_check_update', '1', admin_url('plugins.php'))) . '">' . __('Check for Updates', 'El Pomar') . '</a>';
         array_unshift($links, $update_link);
         return $links;
     }

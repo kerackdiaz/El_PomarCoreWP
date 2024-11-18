@@ -1,51 +1,69 @@
-=== El Pomar ===
-Contributors: inclup
-Tags: ecommerce, woocommerce, products, catalog
-Requires at least: 6.0
-Tested up to: 6.6.2
-Stable tag: 1.0.2
-Requires PHP: 8.2
-License: GPLv2 or later
-License URI: https://www.gnu.org/licenses/gpl-2.0.html
 
-El Pomar es un plugin diseñado para la administración de productos de Leches El Pomar. Este plugin permite crear y gestionar los productos disponibles dentro del catálogo de Leches El Pomar.
+# El Pomar
 
-== Description ==
+Este es un plugin para WordPress que facilita la administración de productos de Leches El Pomar. Con este plugin, puedes crear y gestionar productos, agruparlos por categorías, y mostrarlos en un catálogo interactivo.
 
-El Pomar es un plugin de WordPress que facilita la administración de productos de Leches El Pomar. Con este plugin, puedes crear y gestionar productos, organizarlos en categorías, y mostrarlos en un catálogo interactivo. El plugin es compatible con WooCommerce, lo que permite integrar fácilmente la funcionalidad de comercio electrónico.
+- Tags: plugin, wordpress, products, catalog
+- Requires at least: 6.0
+- Tested up to: 6.6.2
+- Stable tag: 1.1.0
+- Requires PHP: 8.2
+- License: GPLv2 or later
+- License URI: https://www.gnu.org/licenses/gpl-2.0.html
+## Authors
 
-== Features ==
+- [@kerackDiaz](https://www.github.com/kerackdiaz)
+- [Inclup](https://inclup.com)
 
-* Crear y gestionar productos de Leches El Pomar.
-* Organizar productos en categorías.
-* Mostrar productos en un catálogo interactivo.
-* Integración con WooCommerce para la venta de productos.
-* Compatible con Elementor para personalizar la presentación del catálogo.
 
-== Installation ==
+## Used By
 
-1. Sube los archivos del plugin al directorio `/wp-content/plugins/`, o instala el plugin directamente desde la pantalla de plugins de WordPress.
-2. Activa el plugin a través de la pantalla 'Plugins' en WordPress.
-3. Usa el elemento de menú 'El Pomar' para configurar el plugin.
+This project is used by the following companies:
 
-== Changelog ==
-= 1.0.2 =
-* Agregadas imágenes, iconos y estilos para el frontend.
-* Mejoras en la interfaz de usuario.
+- El Pomar
 
-= 1.0.1 =
-* Versión inicial del plugin.
 
-== Frequently Asked Questions ==
+## Features
 
-= ¿Cómo puedo configurar el plugin? =
+- Crear y gestiona el catalogo de productos
+- Agrupa Productos por categorias y marcas
+- Fácil implementación de la ui en el frontend del sitio
+- Compatible con Wordpress 6.0 y php 8.0
+
+
+## Installation
+
+Descargala ultima version del plugin desde [Aqui](https://github.com/kerackdiaz/El_PomarCoreWP/releases) 
+
+- Sube los archivos del plugin al directorio `/wp-content/plugins/`, o instala el plugin directamente desde la pantalla de plugins de WordPress.
+- Activa el plugin a través de la pantalla 'Plugins' en WordPress.
+- En el planel de administracion encontraras una nueva opcion, y dentro, los pasos para usar el shortcode en el frontend
+    
+## FAQ
+
+#### ¿Cómo puedo configurar el plugin?
+
 Puedes configurar el plugin desde el menú 'El Pomar' en el panel de administración de WordPress.
 
-= ¿Es compatible con WooCommerce y Elementor? =
-Sí, el plugin es compatible con WooCommerce y Elementor.
+### ¿Es necesario instalar woocommerce?
+No, ya que el plugin crea si propio catalogo de productos no es necesario el uso de woocommerce para crear el portafolio de productos
 
-== Screenshots ==
 
-1. Pantalla de configuración del plugin.
-2. Vista del catálogo de productos.
-3. Detalles de un producto en el catálogo.
+#### ¿Es compatible con Elementor?
+
+Sí, mediante el shorcode [pomar_core] se puede integrar facilmente 
+
+
+## Changelog
+
+### 1.1.0:
+- Implementación de estilos y responsive en el frontend.
+- Implementación de iconos personalizados.
+- Corrección de vulnerabilidades.
+- Optimización y depuración de código.
+
+### 1.0.2:
+- Agregados los Custom Post Type de marcas y manejo de categorias.
+- Agregado el menú de administración.
+- Corrección de vulnerabilidades y protección de rutas.
+- Implementación de UI por medio de Shorcorde.

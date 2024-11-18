@@ -38,7 +38,7 @@ function Pomar_core_documentation_page() {
                 <li>Derecha: Lista de beneficios del producto seleccionado.</li>
             </ul>
         </div>
-        <div class="footer" style="text-align: center;padding: 20px 0;display: flex;flex-direction: row;align-items: center;align-content: center;flex-wrap: wrap; gap:10px;">
+        <div class="footer" style="text-align: center;display: flex;flex-direction: row;align-items: center;align-content: center;flex-wrap: wrap; gap:10px;">
                 <hr style="width: 100%;">
                 <p>Desarrollado por <a href="https://github.com/kerackdiaz" target="_blank" rel="nofollow"> Kerack Diaz </a> </p>
                 <p>&copy; 2024 <a href="https://inclup.com/" target="_blank" rel="nofollow">Inclup S.A.S</a>. Todos los derechos reservados.</p>

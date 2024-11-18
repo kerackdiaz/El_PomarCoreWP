@@ -58,7 +58,7 @@ function Pomar_core_render_tab_content($post_type, $taxonomy) {
             echo '<div class="accordion-item">';
             echo '<div class="accordion-header">';
             if ($category_icon) {
-                echo '<img src="' . plugin_dir_url(__FILE__) . '../../assets/iconsCat/' . esc_attr($category_icon) . '" alt="' . esc_attr($category->name) . '" class="category-icon">';
+                echo '<img src="' . plugin_dir_url(__FILE__) . '../../assets/img/iconsCat/' . esc_attr($category_icon) . '" alt="' . esc_attr($category->name) . '" class="category-icon">';
             }
             echo '<div class="category-details">';
             echo '<span class="category-name">' . esc_html($category->name) . '</span>';
@@ -112,7 +112,7 @@ function Pomar_core_load_product_details() {
         foreach ($benefits as $benefit) {
             $benefits_list .= '<div class="info-item">';
             if (!empty($benefit['icon'])) {
-                $benefits_list .= '<div class="info-icon"><img src="' . plugin_dir_url(__FILE__) . '../../assets/icons/' . esc_attr($benefit['icon']) . '" alt="' . esc_attr($benefit['text']) . '"></div>';
+                $benefits_list .= '<div class="info-icon"><img src="' . plugin_dir_url(__FILE__) . '../../assets/img/icons/' . esc_attr($benefit['icon']) . '" alt="' . esc_attr($benefit['text']) . '"></div>';
             }
             $benefits_list .= '<div class="benefist-descrip">' . esc_html($benefit['text']) . '</div></div>';
         }
