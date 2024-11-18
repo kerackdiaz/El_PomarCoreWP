@@ -1,5 +1,10 @@
 <?php
 
+if (!defined('ABSPATH')) {
+    exit;
+}
+
+
 add_filter('pre_set_site_transient_update_plugins', 'ep_check_for_plugin_update');
 add_filter('plugins_api', 'ep_plugin_api_call', 10, 3);
 

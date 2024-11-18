@@ -100,9 +100,7 @@ add_action('admin_init', 'el_pomar_check_update');
 
 function el_pomar_check_update() {
     if (isset($_GET['ep_check_update']) && $_GET['ep_check_update'] == '1') {
-        $update_plugins = get_site_transient('update_plugins');
-        $update_plugins = check_for_plugin_update($update_plugins);
-        set_site_transient('update_plugins', $update_plugins);
+        delete_site_transient('update_plugins');
         wp_update_plugins(); // Forzar la actualización de plugins
         add_action('admin_notices', 'el_pomar_update_notice');
     }
