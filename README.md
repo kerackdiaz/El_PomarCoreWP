@@ -1,6 +1,6 @@
 # El Pomar Core
 
-Plugin Desarrollado para Lácteos El Pomar, para la implementación en wordpress.
+Plugin para WordPress que facilita la administración y visualización del catálogo de productos de Leches El Pomar.
 
 ## Información
 
@@ -28,6 +28,7 @@ Este proyecto es utilizado por:
 ### Productos
 - Gestión de catálogo de productos por marcas y categorías.
 - Personalización de iconos para el catálogo de productos.
+- **Shortcode:** `[catalog_pomar]`
 
 ### Ofertas laborales
 - Ajustes en el template del correo que recibe el postulante.
@@ -35,11 +36,13 @@ Este proyecto es utilizado por:
 - Programación de eliminación de archivos.
 - Descarga de todos los postulantes en archivo CSV.
 - Personalización de iconos.
+- **Shortcode:** `[jobs_pomar]`
 
 ### Recetas
 - Creación de recetas.
 - Generación de PDF de la receta.
 - Lista de leads captados por el formulario de descarga de la receta.
+- **Shortcode:** `[recipe_pomar]`
 
 ### News
 - Creación de noticias externas publicadas por otros medios.
@@ -47,6 +50,7 @@ Este proyecto es utilizado por:
 ### Personalización
 - Megamenu personalizado.
 - Implementación de CSS personalizado.
+- **Shortcode:** `[el_pomar_megamenu]`
 
 ## Instalación
 
@@ -54,7 +58,11 @@ Este proyecto es utilizado por:
 2. Sube el archivo ZIP a `/wp-content/plugins/` o instala desde el panel de WordPress
 3. Activa el plugin desde la sección 'Plugins'
 4. Configura las opciones desde el menú 'El Pomar'
-5. Usa el shortcode `[pomar_core]` para mostrar el catálogo
+5. Usa los shortcodes correspondientes para mostrar las diferentes funcionalidades:
+    - `[catalog_pomar]` para el catálogo de productos
+    - `[jobs_pomar]` para las ofertas laborales
+    - `[recipe_pomar]` para las recetas
+    - `[el_pomar_megamenu]` para el megamenu
 
 ## Preguntas Frecuentes
 
@@ -65,7 +73,7 @@ Accede al menú 'El Pomar' en el panel de administración para todas las opcione
 No, el plugin implementa su propio sistema de catálogo independiente.
 
 ### ¿Es compatible con constructores de páginas?
-Sí, puedes insertar el shortcode `[pomar_core]` en cualquier constructor compatible.
+Sí, puedes insertar los shortcodes en cualquier constructor compatible.
 
 ## Registro de Cambios
 
