@@ -1,26 +1,27 @@
 <?php
 if (!defined('ABSPATH')) {
-    exit;
+    header('Status: 403 Forbidden');
+    header('HTTP/1.1 403 Forbidden');
+    exit();
 }
-
 function Pomar_core_shortcode() {
     ob_start();
     ?>
     <div class="productsContainer">
         <nav class="nav-tabs">
-            <a href="#El_Pomar" class="tab active" data-tab="tab-El_Pomar"><img src="<?php echo plugin_dir_url(__FILE__) . '../../assets/img/el_pomar.svg'; ?>" alt="El Pomar"> </a>
-            <a href="#Mulai" class="tab" data-tab="tab-Mulai"><img src="<?php echo plugin_dir_url(__FILE__) . '../../assets/img/Mulai.svg'; ?>" alt="Mulai"></a>
-            <a href="#Levelma" class="tab" data-tab="tab-Levelma"><img src="<?php echo plugin_dir_url(__FILE__) . '../../assets/img/levelma.svg'; ?>" alt="Levelma"></a>
+            <a href="#El_Pomar" class="tab active" data-tab="tab-El_Pomar"><img src="<?php echo plugin_dir_url(__FILE__) . '../../../assets/img/catalog/el_pomar.svg'; ?>" alt="El Pomar"> </a>
+            <a href="#Mulai" class="tab" data-tab="tab-Mulai"><img src="<?php echo plugin_dir_url(__FILE__) . '../../../assets/img/catalog/Mulai.svg'; ?>" alt="Mulai"></a>
+            <a href="#Levelma" class="tab" data-tab="tab-Levelma"><img src="<?php echo plugin_dir_url(__FILE__) . '../../../assets/img/catalog/levelma.svg'; ?>" alt="Levelma"></a>
         </nav>
         
         <div class="container">
-            <div id="tab-El_Pomar" class="tab-content current" style="background-image: url('<?php echo plugin_dir_url(__FILE__) . '../../assets/img/bg-el-pomar.jpg'; ?>'">
+            <div id="tab-El_Pomar" class="tab-content current" style="background-image: url('<?php echo plugin_dir_url(__FILE__) . '../../../assets/img/catalog/bg-el-pomar.jpg'; ?>'">
                 <?php Pomar_core_render_tab_content('el_pomar', 'el_pomar_category'); ?>
             </div>
-            <div id="tab-Mulai" class="tab-content" style="background-image: url('<?php echo plugin_dir_url(__FILE__) . '../../assets/img/bg-mulai.jpg'; ?>'">
+            <div id="tab-Mulai" class="tab-content" style="background-image: url('<?php echo plugin_dir_url(__FILE__) . '../../../assets/img/catalog/bg-mulai.jpg'; ?>'">
                 <?php Pomar_core_render_tab_content('mulai', 'mulai_category'); ?>
             </div>
-            <div id="tab-Levelma" class="tab-content" style="background-image: url('<?php echo plugin_dir_url(__FILE__) . '../../assets/img/bg-levelma.jpg'; ?>'">
+            <div id="tab-Levelma" class="tab-content" style="background-image: url('<?php echo plugin_dir_url(__FILE__) . '../../../assets/img/catalog/bg-levelma.jpg'; ?>'">
                 <?php Pomar_core_render_tab_content('levelma', 'levelma_category'); ?>
             </div>
         </div>
@@ -28,7 +29,7 @@ function Pomar_core_shortcode() {
     <?php
     return ob_get_clean();
 }
-add_shortcode('pomar_core', 'Pomar_core_shortcode');
+add_shortcode('catalog_pomar', 'Pomar_core_shortcode');
 
 function Pomar_core_render_tab_content($post_type, $taxonomy) {
     $categories = get_terms(array(
@@ -58,19 +59,19 @@ function Pomar_core_render_tab_content($post_type, $taxonomy) {
             echo '<div class="accordion-item">';
             echo '<div class="accordion-header">';
             if ($category_icon) {
-                echo '<img src="' . plugin_dir_url(__FILE__) . '../../assets/img/iconsCat/' . esc_attr($category_icon) . '" alt="' . esc_attr($category->name) . '" class="category-icon">';
+                echo '<img src="' . plugin_dir_url(__FILE__) . '../../assets/img/catalog/categories/' . esc_attr($category_icon) . '" alt="' . esc_attr($category->name) . '" class="category-icon">';
             }
             echo '<div class="category-details">';
             echo '<span class="category-name">' . esc_html($category->name) . '</span>';
             echo '</div>';
-            echo '<img src="' . plugin_dir_url(__FILE__) . '../../assets/img/' . ($index === 0 ? 'minus' : 'plus') . '.svg' . '" alt="Toggle Icon" class="toggle-icon">';
+            echo '<img src="' . plugin_dir_url(__FILE__) . '../../assets/img/icons/' . ($index === 0 ? 'minus' : 'plus') . '.svg' . '" alt="Toggle Icon" class="toggle-icon">';
             echo '</div>';
             echo '<div class="accordion-content" style="display: ' . ($index === 0 ? 'block' : 'none') . ';">';
             if (!empty($posts)) {
                 echo '<ul>';
                 foreach ($posts as $post_index => $post) {
                     echo '<li><a href="#" class="product-link ' . ($index === 0 && $post_index === 0 ? 'active' : '') . '" data-post-id="' . esc_attr($post->ID) . '">';
-                    echo '<img src="' . plugin_dir_url(__FILE__) . '../../assets/img/right-arrow.svg' . '" alt="Right Arrow" class="product-icon">';
+                    echo '<img src="' . plugin_dir_url(__FILE__) . '../../assets/img/icons/right-arrow.svg' . '" alt="Right Arrow" class="product-icon">';
                     echo esc_html($post->post_title) . '</a></li>';
                 }
                 echo '</ul>';
@@ -87,7 +88,7 @@ function Pomar_core_render_tab_content($post_type, $taxonomy) {
         echo '<div class="product-image">';
         echo '<img src="" alt="" id="product-image">';
         echo '</div>';
-        echo '<a href="#" id="product-url" class="buy-button">Comprar Producto</a>';
+        echo '<a href="#" id="product-url" class="buy-button" target:_blank>Comprar Producto</a>';
         echo '</div>';
 
         echo '<div class="col-25">';
@@ -112,7 +113,7 @@ function Pomar_core_load_product_details() {
         foreach ($benefits as $benefit) {
             $benefits_list .= '<div class="info-item">';
             if (!empty($benefit['icon'])) {
-                $benefits_list .= '<div class="info-icon"><img src="' . plugin_dir_url(__FILE__) . '../../assets/img/icons/' . esc_attr($benefit['icon']) . '" alt="' . esc_attr($benefit['text']) . '"></div>';
+                $benefits_list .= '<div class="info-icon"><img src="' . plugin_dir_url(__FILE__) . '../../assets/img/catalog/icons/' . esc_attr($benefit['icon']) . '" alt="' . esc_attr($benefit['text']) . '"></div>';
             }
             $benefits_list .= '<div class="benefist-descrip">' . esc_html($benefit['text']) . '</div></div>';
         }

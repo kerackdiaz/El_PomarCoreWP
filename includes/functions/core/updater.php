@@ -4,7 +4,6 @@ if (!defined('ABSPATH')) {
     exit;
 }
 
-
 add_filter('pre_set_site_transient_update_plugins', 'ep_check_for_plugin_update');
 add_filter('plugins_api', 'ep_plugin_api_call', 10, 3);
 
@@ -63,13 +62,13 @@ function ep_plugin_api_call($ep_default, $ep_action, $ep_args) {
     $plugin_info = [
         'name' => 'El Pomar Core',
         'slug' => plugin_basename(EP_FILE),
-        'version' => get_remote_plugin_version(),
+        'version' => ep_get_remote_plugin_version(),
         'author' => 'Inclup',
         'homepage' => 'https://github.com/kerackdiaz/El_PomarCoreWP',
         'sections' => [
             'description' => 'Este plugin es exclusivo para la administración y venta de productos de Leches El Pomar.',
         ],
-        'download_link' => 'https://github.com/kerackdiaz/El_PomarCoreWP/archive/refs/tags/V' . get_remote_plugin_version() . '.zip',
+        'download_link' => 'https://github.com/kerackdiaz/El_PomarCoreWP/archive/refs/tags/V' . ep_get_remote_plugin_version() . '.zip',
     ];
 
     return (object) $plugin_info;
