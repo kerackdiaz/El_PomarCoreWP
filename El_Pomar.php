@@ -3,7 +3,7 @@
  * Plugin Name: El Pomar
  * Plugin URI: https://inclup.com/
  * Description: Gestiona tu catalogo de productos, publica ofertas laborales, crea nuevas recetas y muestra las noticias de tu empresa.
- * Version: 2.1.5
+ * Version: 2.2.1
  * Author: KerackDiaz
  * Author URI: https://github.com/KerackDiaz
  * License: GPLv2
@@ -11,7 +11,6 @@
  * Text Domain: El Pomar
  * Requires at least: 6.6.2
  * Requires PHP: 8.0
- * Requires WooCommerce: 9.0
  * Wordpress tested up to: 6.6.2
  * @package El_Pomar
  */
@@ -23,7 +22,7 @@ if (!defined('ABSPATH')) {
 }
 
 if (!defined('EP_VERSION')) {
-    define('EP_VERSION', '2.1.5');
+    define('EP_VERSION', '2.2.1');
 }
 
 if (!defined('EP_FILE')) {
@@ -64,8 +63,6 @@ if (!class_exists(('El_Pomar_Core'))) {
         private function __construct() {
             register_activation_hook(EP_FILE, array(__CLASS__, 'EP_activate'));
             register_deactivation_hook(EP_FILE, array(__CLASS__, 'EP_deactivate'));
-            add_action('init', array($this, 'EP_load_add_on'));
-            add_action('admin_init', array($this, 'is_compatible'));
             add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_styles'));
             add_action('wp_enqueue_scripts', array($this, 'enqueue_frontend_scripts'));
             add_action('admin_enqueue_scripts', array($this, 'enqueue_admin_styles'));
@@ -105,52 +102,9 @@ if (!class_exists(('El_Pomar_Core'))) {
         }
 
         /**
-         * Incluir add-on en el fichero de registro
-         */
-        public function EP_load_add_on() {
-            if (is_plugin_active('woocommerce/woocommerce.php')) {
-                // Cargar add-ons aquí
-            }
-        }
-
-        /**
-         * Check if WooCommerce is active
-         */
-        public function is_compatible() {
-            if (!is_plugin_active('woocommerce/woocommerce.php')) {
-                add_action('admin_notices', function() {
-                    $this->admin_notice_missing_main_plugin('WooCommerce');
-                });
-                deactivate_plugins(plugin_basename(__FILE__));
-                return;
-            }
-        }
-
-        /**
-         * Muestra una notificación si WooCommerce no está activo
-         */
-        public function admin_notice_missing_main_plugin($plugin_name) {
-            $message = sprintf(
-                esc_html__('%1$s requiere que %2$s esté activo. Por favor activa %2$s para continuar.', 'el_pomar'),
-                '<strong>' . esc_html__('El Pomar', 'el_pomar') . '</strong>',
-                '<strong>' . esc_html__($plugin_name, 'el_pomar') . '</strong>'
-            );
-            printf('<div class="notice notice-error is-dismissible"><p>%1$s</p></div>', $message);
-            deactivate_plugins(plugin_basename(__FILE__));
-        }
-
-        /**
          * Función de activación del plugin
          */
         public static function EP_activate() {
-            if (!is_plugin_active('woocommerce/woocommerce.php')) {
-                deactivate_plugins(plugin_basename(__FILE__));
-                wp_die(
-                    esc_html__('Este plugin requiere WooCommerce para ser activado.', 'el_pomar'),
-                    esc_html__('Error de Activación', 'el_pomar'),
-                    array('back_link' => true)
-                );
-            }
             update_option('EP_version', EP_VERSION);
             el_pomar_create_applicants_table();
             el_pomar_create_form_table(); // Asegúrate de crear la tabla para el formulario de recetas
@@ -185,7 +139,12 @@ if (!class_exists(('El_Pomar_Core'))) {
         // Encolar los scripts para el frontend
         public function enqueue_frontend_scripts() {
             wp_enqueue_script('el_pomar-offert-functions', plugin_dir_url(__FILE__) . 'assets/js/frontend/offert-functions.js', ['jquery'], '1.0.0', true);
+            wp_enqueue_script('el_pomar-catalog-frontend', plugin_dir_url(__FILE__) . 'assets/js/frontend/catalog_frontend.js', ['jquery'], '1.0.0', true);
             wp_localize_script('el_pomar-offert-functions', 'el_pomar_core', array(
+                'ajax_url' => admin_url('admin-ajax.php'),
+                'plugin_url' => EP_PLUGIN_URL,
+            ));
+            wp_localize_script('el_pomar-catalog-frontend', 'pomar_core', array(
                 'ajax_url' => admin_url('admin-ajax.php'),
                 'plugin_url' => EP_PLUGIN_URL,
             ));

@@ -6,25 +6,6 @@ if (!defined('ABSPATH')) {
 }
 
 function el_pomar_jobs_settings_page() {
-    $categories_icons = glob(EP_PLUGIN_DIR . 'assets/img/jobs/categories/*.svg');
-
-
-    if (isset($_GET['delete_icon'])) {
-        $icon_name = sanitize_text_field($_GET['delete_icon']);
-        $delete_path = EP_PLUGIN_DIR . 'assets/img/jobs/categories/' . $icon_name;
-
-        if (file_exists($delete_path)) {
-            unlink($delete_path);
-            echo '<div class="notice notice-success is-dismissible"><p>Icono eliminado exitosamente.</p></div>';
-        } else {
-            echo '<div class="notice notice-error is-dismissible"><p>Error al eliminar el icono.</p></div>';
-        }
-
-
-        wp_redirect(admin_url('admin.php?page=el-pomar-jobs-settings'));
-        exit();
-    }
-
     ?>
     <form method="post" action="options.php">
         <?php
@@ -36,13 +17,15 @@ function el_pomar_jobs_settings_page() {
 
     <h3>Iconos de Categorías</h3>
     <div class="icon-grid">
-        <?php foreach ($categories_icons as $icon) : ?>
+        <?php
+        $categories_icons = glob(EP_PLUGIN_DIR . 'assets/img/jobs/categories/*.svg');
+        foreach ($categories_icons as $icon) : ?>
             <div class="icon-item">
                 <img src="<?php echo plugin_dir_url(__FILE__) . '../../../assets/img/jobs/categories/' . basename($icon); ?>" alt="<?php echo basename($icon); ?>" style="background:black;">
                 <p><?php echo basename($icon); ?></p>
                 <div class="icon-actions">
                     <a href="<?php echo plugin_dir_url(__FILE__) . '../../../assets/img/jobs/categories/' . basename($icon); ?>" download>Descargar</a>
-                    <a href="?page=el-pomar-jobs-settings&delete_icon=<?php echo urlencode(basename($icon)); ?>" class="delete-icon">Eliminar</a>
+                    <a href="#" class="delete-icon" data-icon="<?php echo urlencode(basename($icon)); ?>">Eliminar</a>
                 </div>
             </div>
         <?php endforeach; ?>
@@ -56,26 +39,6 @@ function el_pomar_jobs_settings_page() {
         <input type="submit" name="upload-icon" value="Subir Icono">
     </form>
 
-    <?php
-    if (isset($_POST['upload-icon'])) {
-        $upload_dir = EP_PLUGIN_DIR . 'assets/img/jobs/categories/';
-        $upload_url = plugin_dir_url(__FILE__) . '../../../assets/img/jobs/categories/';
-
-        if (!empty($_FILES['icon-file']['name'])) {
-            $uploaded_file = $_FILES['icon-file'];
-            $uploaded_file_name = basename($uploaded_file['name']);
-            $uploaded_file_path = $upload_dir . $uploaded_file_name;
-
-            if (move_uploaded_file($uploaded_file['tmp_name'], $uploaded_file_path)) {
-                echo '<div class="notice notice-success is-dismissible"><p>Icono subido exitosamente: <a href="' . esc_url($upload_url . $uploaded_file_name) . '" target="_blank">' . esc_html($uploaded_file_name) . '</a></p></div>';
-            } else {
-                echo '<div class="notice notice-error is-dismissible"><p>Error al subir el icono.</p></div>';
-            }
-        } else {
-            echo '<div class="notice notice-error is-dismissible"><p>Por favor, selecciona un archivo SVG para subir.</p></div>';
-        }
-    }
-    ?>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             var useAdminEmailCheckbox = document.querySelector('input[name="el_pomar_use_admin_email"]');
@@ -115,9 +78,96 @@ function el_pomar_jobs_settings_page() {
                     insertAtCursor(emailBodyField, variable);
                 });
             });
+
+            // Manejar la eliminación de iconos
+            document.querySelectorAll('.delete-icon').forEach(function(button) {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    var iconName = this.getAttribute('data-icon');
+                    var data = new FormData();
+                    data.append('action', 'delete_icon');
+                    data.append('icon_name', iconName);
+
+                    fetch(ajaxurl, {
+                        method: 'POST',
+                        body: data,
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            location.reload();
+                        } else {
+                            alert('Error al eliminar el icono.');
+                        }
+                    });
+                });
+            });
+
+            // Manejar la subida de iconos
+            document.getElementById('upload-icon-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                var formData = new FormData(this);
+                formData.append('action', 'upload_icon');
+
+                fetch(ajaxurl, {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        alert('Error al subir el icono.');
+                    }
+                });
+            });
         });
     </script>
     <?php
+}
+
+add_action('wp_ajax_delete_icon', 'el_pomar_delete_icon');
+function el_pomar_delete_icon() {
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('No tienes permisos para realizar esta acción.');
+    }
+
+    if (isset($_POST['icon_name'])) {
+        $icon_name = sanitize_text_field($_POST['icon_name']);
+        $delete_path = EP_PLUGIN_DIR . 'assets/img/jobs/categories/' . $icon_name;
+
+        if (file_exists($delete_path)) {
+            unlink($delete_path);
+            wp_send_json_success();
+        } else {
+            wp_send_json_error('El icono no existe.');
+        }
+    } else {
+        wp_send_json_error('Nombre del icono no proporcionado.');
+    }
+}
+
+add_action('wp_ajax_upload_icon', 'el_pomar_upload_icon');
+function el_pomar_upload_icon() {
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('No tienes permisos para realizar esta acción.');
+    }
+
+    if (!empty($_FILES['icon-file']['name'])) {
+        $upload_dir = EP_PLUGIN_DIR . 'assets/img/jobs/categories/';
+        $uploaded_file = $_FILES['icon-file'];
+        $uploaded_file_name = basename($uploaded_file['name']);
+        $uploaded_file_path = $upload_dir . $uploaded_file_name;
+
+        if (move_uploaded_file($uploaded_file['tmp_name'], $uploaded_file_path)) {
+            wp_send_json_success();
+        } else {
+            wp_send_json_error('Error al mover el archivo subido.');
+        }
+    } else {
+        wp_send_json_error('No se seleccionó ningún archivo.');
+    }
 }
 
 class ElPomar_Jobs_Settings {

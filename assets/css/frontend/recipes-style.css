@@ -49,7 +49,6 @@ span.post-date {
 .recipe-ingredients {
     list-style-type: disc;
     padding-left: 50px;
-    width: 50%;
 }
 
 .recipe-ingredients li {
@@ -114,6 +113,8 @@ span.post-date {
 
 .recipe-actions {
     display: flex;
+	flex-wrap:wrap;
+	gap:15px
 }
 
 .recipe-actions button {

@@ -5,6 +5,45 @@ if (!defined('ABSPATH')) {
     exit();
 }
 
+// 1. Mover la definición de la función antes de su uso
+if (!function_exists('el_pomar_download_csv_recipes')) {
+    function el_pomar_download_csv_recipes() {
+        global $wpdb;
+        $table_name = $wpdb->prefix . 'el_pomar_form_submissions';
+        $submissions = $wpdb->get_results("SELECT * FROM $table_name");
+
+        header('Content-Type: text/csv; charset=UTF-8');
+        header('Content-Disposition: attachment;filename=interacciones_recetas.csv');
+        echo "\xEF\xBB\xBF"; // Añadir BOM para UTF-8
+
+        $output = fopen('php://output', 'w');
+        fputcsv($output, array('Nombre', 'Teléfono', 'Email', 'Receta', 'Fecha de Envío'));
+
+        foreach ($submissions as $submission) {
+            fputcsv($output, array(
+                $submission->name,
+                $submission->phone,
+                $submission->email,
+                get_the_title($submission->recipe_id),
+                $submission->submission_date
+            ));
+        }
+
+        fclose($output);
+        exit();
+    }
+}
+
+// 2. Modificar el manejo del POST para usar add_action
+add_action('admin_init', 'handle_csv_download');
+
+function handle_csv_download() {
+    if (isset($_POST['action']) && $_POST['action'] == 'download_csv_recipes') {
+        el_pomar_download_csv_recipes();
+    }
+}
+
+// 3. El resto del código de recipes_form_list.php permanece igual
 function el_pomar_form_submissions_page() {
     global $wpdb;
     $table_name = $wpdb->prefix . 'el_pomar_form_submissions';
@@ -33,7 +72,7 @@ function el_pomar_form_submissions_page() {
             <button type="submit">Filtrar</button>
         </form>
         <form method="post" action="" class="downloadBTN">
-            <input type="hidden" name="action" value="download_csv">
+            <input type="hidden" name="action" value="download_csv_recipes">
             <button type="submit">Descargar CSV</button>
         </form>
         <form method="post" action="" class="deleteBTN">
@@ -82,44 +121,12 @@ function el_pomar_form_submissions_page() {
     <?php
 }
 
-if (isset($_POST['action']) && $_POST['action'] == 'download_csv') {
-    el_pomar_download_csv();
-}
-
 if (isset($_POST['action']) && $_POST['action'] == 'delete_submissions') {
     el_pomar_delete_submissions();
 }
 
 if (isset($_GET['action']) && $_GET['action'] == 'delete_submission' && isset($_GET['id'])) {
     el_pomar_delete_submission(intval($_GET['id']));
-}
-
-if (!function_exists('el_pomar_download_csv')) {
-    function el_pomar_download_csv() {
-        global $wpdb;
-        $table_name = $wpdb->prefix . 'el_pomar_form_submissions';
-        $submissions = $wpdb->get_results("SELECT * FROM $table_name");
-
-        header('Content-Type: text/csv; charset=UTF-8');
-        header('Content-Disposition: attachment;filename=interacciones_recetas.csv');
-        echo "\xEF\xBB\xBF"; 
-
-        $output = fopen('php://output', 'w');
-        fputcsv($output, array('Nombre', 'Teléfono', 'Email', 'Receta', 'Fecha de Envío'));
-
-        foreach ($submissions as $submission) {
-            fputcsv($output, array(
-                $submission->name,
-                $submission->phone,
-                $submission->email,
-                get_the_title($submission->recipe_id),
-                $submission->submission_date
-            ));
-        }
-
-        fclose($output);
-        exit();
-    }
 }
 
 if (!function_exists('el_pomar_delete_submissions')) {

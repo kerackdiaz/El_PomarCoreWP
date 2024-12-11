@@ -5,7 +5,6 @@ if (!defined('ABSPATH')) {
     exit();
 }
 
-
 function el_pomar_register_settings() {
     register_setting('el_pomar_settings_group', 'el_pomar_main_menu');
     register_setting('el_pomar_settings_group', 'el_pomar_menu_interactions', 'el_pomar_sanitize_interactions');
@@ -65,11 +64,9 @@ function el_pomar_register_settings() {
 }
 add_action('admin_init', 'el_pomar_register_settings');
 
-
 function el_pomar_settings_section_callback() {
     echo '<p>' . __('Selecciona el menú principal que se mostrará en el frontend y configura las interacciones de cada opción del menú.', 'el_pomar') . '</p>';
 }
-
 
 function el_pomar_main_menu_callback() {
     $menus = wp_get_nav_menus();
@@ -103,7 +100,7 @@ function el_pomar_menu_interactions_callback() {
         echo '<table class="form-table">';
         foreach ($menu_items as $item) {
             $interaction = isset($menu_interactions[$item->ID]) ? $menu_interactions[$item->ID] : 'url';
-            $megamenu_type = !empty(array_filter($submenus[$item->ID])) ? 'submenus' : (isset($custom_content[$item->ID]) ? 'custom' : 'submenus');
+            $megamenu_type = (isset($submenus[$item->ID]) && is_array($submenus[$item->ID]) && !empty(array_filter($submenus[$item->ID]))) ? 'submenus' : (isset($custom_content[$item->ID]) ? 'custom' : 'submenus');
             ?>
             <tr>
                 <th scope="row"><?php echo esc_html($item->title); ?></th>
@@ -196,7 +193,6 @@ function el_pomar_menu_interactions_callback() {
     }
 }
 
-
 function el_pomar_custom_styles_callback() {
     $custom_styles = get_option('el_pomar_custom_styles', '');
     echo '<textarea name="el_pomar_custom_styles" rows="10" cols="50" class="large-text">' . esc_textarea($custom_styles) . '</textarea>';
@@ -244,7 +240,6 @@ function el_pomar_sanitize_submenu_titles($input) {
     }
     return $output;
 }
-
 
 function el_pomar_global_settings_page() {
     ?>

@@ -59,19 +59,19 @@ function Pomar_core_render_tab_content($post_type, $taxonomy) {
             echo '<div class="accordion-item">';
             echo '<div class="accordion-header">';
             if ($category_icon) {
-                echo '<img src="' . plugin_dir_url(__FILE__) . '../../assets/img/catalog/categories/' . esc_attr($category_icon) . '" alt="' . esc_attr($category->name) . '" class="category-icon">';
+                echo '<img src="' . plugin_dir_url(__FILE__) . '../../../assets/img/catalog/categories/' . esc_attr($category_icon) . '" alt="' . esc_attr($category->name) . '" class="category-icon">';
             }
             echo '<div class="category-details">';
             echo '<span class="category-name">' . esc_html($category->name) . '</span>';
             echo '</div>';
-            echo '<img src="' . plugin_dir_url(__FILE__) . '../../assets/img/icons/' . ($index === 0 ? 'minus' : 'plus') . '.svg' . '" alt="Toggle Icon" class="toggle-icon">';
+            echo '<img src="' . plugin_dir_url(__FILE__) . '../../../assets/img/icons/' . ($index === 0 ? 'minus' : 'plus') . '.svg' . '" alt="Toggle Icon" class="toggle-icon">';
             echo '</div>';
             echo '<div class="accordion-content" style="display: ' . ($index === 0 ? 'block' : 'none') . ';">';
             if (!empty($posts)) {
                 echo '<ul>';
                 foreach ($posts as $post_index => $post) {
                     echo '<li><a href="#" class="product-link ' . ($index === 0 && $post_index === 0 ? 'active' : '') . '" data-post-id="' . esc_attr($post->ID) . '">';
-                    echo '<img src="' . plugin_dir_url(__FILE__) . '../../assets/img/icons/right-arrow.svg' . '" alt="Right Arrow" class="product-icon">';
+                    echo '<img src="' . plugin_dir_url(__FILE__) . '../../../assets/img/icons/right-arrow.svg' . '" alt="Right Arrow" class="product-icon">';
                     echo esc_html($post->post_title) . '</a></li>';
                 }
                 echo '</ul>';
@@ -113,7 +113,7 @@ function Pomar_core_load_product_details() {
         foreach ($benefits as $benefit) {
             $benefits_list .= '<div class="info-item">';
             if (!empty($benefit['icon'])) {
-                $benefits_list .= '<div class="info-icon"><img src="' . plugin_dir_url(__FILE__) . '../../assets/img/catalog/icons/' . esc_attr($benefit['icon']) . '" alt="' . esc_attr($benefit['text']) . '"></div>';
+                $benefits_list .= '<div class="info-icon"><img src="' . plugin_dir_url(__FILE__) . '../../../assets/img/catalog/icons/' . esc_attr($benefit['icon']) . '" alt="' . esc_attr($benefit['text']) . '"></div>';
             }
             $benefits_list .= '<div class="benefist-descrip">' . esc_html($benefit['text']) . '</div></div>';
         }

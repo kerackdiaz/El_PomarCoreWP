@@ -6,39 +6,21 @@ if (!defined('ABSPATH')) {
 }
 
 function Pomar_core_catalog_settings_page() {
-    $categories_icons = glob(EP_PLUGIN_DIR . 'assets/img/catalog/categories/*.svg');
-    $icons = glob(EP_PLUGIN_DIR . 'assets/img/catalog/icons/*.svg');
-
-    if (isset($_GET['delete_icon']) && isset($_GET['type'])) {
-        $icon_name = sanitize_text_field($_GET['delete_icon']);
-        $icon_type = sanitize_text_field($_GET['type']);
-        $delete_dir = ($icon_type === 'categories') ? EP_PLUGIN_DIR . 'assets/img/catalog/categories/' : EP_PLUGIN_DIR . 'assets/img/catalog/icons/';
-        $delete_path = $delete_dir . $icon_name;
-
-        if (file_exists($delete_path)) {
-            unlink($delete_path);
-            echo '<div class="notice notice-success is-dismissible"><p>Icono eliminado exitosamente.</p></div>';
-        } else {
-            echo '<div class="notice notice-error is-dismissible"><p>Error al eliminar el icono.</p></div>';
-        }
-
-        wp_redirect(admin_url('admin.php?page=el-pomar-catalog-settings'));
-        exit();
-    }
-
     ?>
     <div>
         <p>Carga, elimina o descarga los iconos de categorías o beneficios del portafolio de productos El Pomar.</p>
 
         <h3>Iconos de Categorías</h3>
         <div class="icon-grid">
-            <?php foreach ($categories_icons as $icon) : ?>
+            <?php
+            $categories_icons = glob(EP_PLUGIN_DIR . 'assets/img/catalog/categories/*.svg');
+            foreach ($categories_icons as $icon) : ?>
                 <div class="icon-item">
                     <img src="<?php echo plugin_dir_url(__FILE__) . '../../../assets/img/catalog/categories/' . basename($icon); ?>" alt="<?php echo basename($icon); ?>" style="background:black;">
                     <p><?php echo basename($icon); ?></p>
                     <div class="icon-actions">
                         <a href="<?php echo plugin_dir_url(__FILE__) . '../../../assets/img/catalog/categories/' . basename($icon); ?>" download>Descargar</a>
-                        <a href="?page=el-pomar-catalog-settings&delete_icon=<?php echo urlencode(basename($icon)); ?>&type=categories" class="delete-icon">Eliminar</a>
+                        <a href="#" class="delete-icon" data-icon="<?php echo urlencode(basename($icon)); ?>" data-type="categories">Eliminar</a>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -46,13 +28,15 @@ function Pomar_core_catalog_settings_page() {
 
         <h3>Iconos Beneficios</h3>
         <div class="icon-grid">
-            <?php foreach ($icons as $icon) : ?>
+            <?php
+            $icons = glob(EP_PLUGIN_DIR . 'assets/img/catalog/icons/*.svg');
+            foreach ($icons as $icon) : ?>
                 <div class="icon-item">
                     <img src="<?php echo plugin_dir_url(__FILE__) . '../../../assets/img/catalog/icons/' . basename($icon); ?>" alt="<?php echo basename($icon); ?>" style="filter:invert(1);">
                     <p><?php echo basename($icon); ?></p>
                     <div class="icon-actions">
                         <a href="<?php echo plugin_dir_url(__FILE__) . '../../../assets/img/catalog/icons/' . basename($icon); ?>" download>Descargar</a>
-                        <a href="?page=el-pomar-catalog-settings&delete_icon=<?php echo urlencode(basename($icon)); ?>&type=icons" class="delete-icon">Eliminar</a>
+                        <a href="#" class="delete-icon" data-icon="<?php echo urlencode(basename($icon)); ?>" data-type="icons">Eliminar</a>
                     </div>
                 </div>
             <?php endforeach; ?>
@@ -73,24 +57,104 @@ function Pomar_core_catalog_settings_page() {
         </form>
     </div>
 
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Manejar la eliminación de iconos
+            document.querySelectorAll('.delete-icon').forEach(function(button) {
+                button.addEventListener('click', function(event) {
+                    event.preventDefault();
+                    var iconName = this.getAttribute('data-icon');
+                    var iconType = this.getAttribute('data-type');
+                    var data = new FormData();
+                    data.append('action', 'delete_catalog_icon');
+                    data.append('icon_name', iconName);
+                    data.append('icon_type', iconType);
+
+                    fetch(ajaxurl, {
+                        method: 'POST',
+                        body: data,
+                    })
+                    .then(response => response.json())
+                    .then(result => {
+                        if (result.success) {
+                            location.reload();
+                        } else {
+                            alert('Error al eliminar el icono.');
+                        }
+                    });
+                });
+            });
+
+            // Manejar la subida de iconos
+            document.getElementById('upload-icon-form').addEventListener('submit', function(event) {
+                event.preventDefault();
+                var formData = new FormData(this);
+                formData.append('action', 'upload_catalog_icon');
+
+                fetch(ajaxurl, {
+                    method: 'POST',
+                    body: formData,
+                })
+                .then(response => response.json())
+                .then(result => {
+                    if (result.success) {
+                        location.reload();
+                    } else {
+                        alert('Error al subir el icono.');
+                    }
+                });
+            });
+        });
+    </script>
     <?php
-    if (isset($_POST['upload-icon'])) {
-        $icon_type = sanitize_text_field($_POST['icon-type']);
-        $upload_dir = ($icon_type === 'categories') ? EP_PLUGIN_DIR . 'assets/img/catalog/categories/' : EP_PLUGIN_DIR . 'assets/img/catalog/icons/';
-        $upload_url = ($icon_type === 'categories') ? plugin_dir_url(__FILE__) . '../../assets/img/catalog/categories/' : plugin_dir_url(__FILE__) . '../../assets/img/catalog/icons/';
+}
 
-        if (!empty($_FILES['icon-file']['name'])) {
-            $uploaded_file = $_FILES['icon-file'];
-            $uploaded_file_name = basename($uploaded_file['name']);
-            $uploaded_file_path = $upload_dir . $uploaded_file_name;
+add_action('wp_ajax_delete_catalog_icon', 'el_pomar_delete_catalog_icon');
+function el_pomar_delete_catalog_icon() {
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('No tienes permisos para realizar esta acción.');
+    }
 
-            if (move_uploaded_file($uploaded_file['tmp_name'], $uploaded_file_path)) {
-                echo '<div class="notice notice-success is-dismissible"><p>Icono subido exitosamente: <a href="' . esc_url($upload_url . $uploaded_file_name) . '" target="_blank">' . esc_html($uploaded_file_name) . '</a></p></div>';
-            } else {
-                echo '<div class="notice notice-error is-dismissible"><p>Error al subir el icono.</p></div>';
-            }
+    if (isset($_POST['icon_name']) && isset($_POST['icon_type'])) {
+        $icon_name = sanitize_text_field($_POST['icon_name']);
+        $icon_type = sanitize_text_field($_POST['icon_type']);
+        $delete_dir = ($icon_type === 'categories') ? EP_PLUGIN_DIR . 'assets/img/catalog/categories/' : EP_PLUGIN_DIR . 'assets/img/catalog/icons/';
+        $delete_path = $delete_dir . $icon_name;
+
+        if (file_exists($delete_path)) {
+            unlink($delete_path);
+            wp_send_json_success();
         } else {
-            echo '<div class="notice notice-error is-dismissible"><p>Por favor, selecciona un archivo SVG para subir.</p></div>';
+            wp_send_json_error('El icono no existe.');
         }
+    } else {
+        wp_send_json_error('Nombre del icono o tipo no proporcionado.');
     }
 }
+
+add_action('wp_ajax_upload_catalog_icon', 'el_pomar_upload_catalog_icon');
+function el_pomar_upload_catalog_icon() {
+    if (!current_user_can('manage_options')) {
+        wp_send_json_error('No tienes permisos para realizar esta acción.');
+    }
+
+    if (!empty($_FILES['icon-file']['name']) && isset($_POST['icon-type'])) {
+        $icon_type = sanitize_text_field($_POST['icon-type']);
+        $upload_dir = ($icon_type === 'categories') ? EP_PLUGIN_DIR . 'assets/img/catalog/categories/' : EP_PLUGIN_DIR . 'assets/img/catalog/icons/';
+        $uploaded_file = $_FILES['icon-file'];
+        $uploaded_file_name = basename($uploaded_file['name']);
+        $uploaded_file_path = $upload_dir . $uploaded_file_name;
+
+        if (move_uploaded_file($uploaded_file['tmp_name'], $uploaded_file_path)) {
+            wp_send_json_success();
+        } else {
+            wp_send_json_error('Error al mover el archivo subido.');
+        }
+    } else {
+        wp_send_json_error('No se seleccionó ningún archivo o tipo de icono.');
+    }
+}
+
+add_action('admin_menu', function() {
+    add_menu_page('Configuración del Catálogo', 'Configuración del Catálogo', 'manage_options', 'el-pomar-catalog-settings', 'Pomar_core_catalog_settings_page');
+});

@@ -1,75 +1,133 @@
 <?php
-
 if (!defined('ABSPATH')) {
-    exit;
+    header('Status: 403 Forbidden');
+    header('HTTP/1.1 403 Forbidden');
+    exit();
 }
 
-add_filter('pre_set_site_transient_update_plugins', 'ep_check_for_plugin_update');
-add_filter('plugins_api', 'ep_plugin_api_call', 10, 3);
+class El_Pomar_GitHub_Updater {
+    private $file;
+    private $plugin;
+    private $basename;
+    private $active;
+    private $github_response;
+    private $github_repo = 'El_PomarCoreWP'; 
+    private $github_user = 'KerackDiaz'; 
+    private $access_token = ''; 
 
-function ep_check_for_plugin_update($ep_transient) {
-    if (empty($ep_transient->checked)) {
-        return $ep_transient;
+    public function __construct($file) {
+        $this->file = $file;
+        add_action('admin_init', array($this, 'set_plugin_properties'));
+        add_filter('pre_set_site_transient_update_plugins', array($this, 'check_update'));
+        add_filter('plugins_api', array($this, 'plugin_popup'), 10, 3);
+        add_filter('upgrader_post_install', array($this, 'after_install'), 10, 3);
     }
 
-    $ep_remote_version = ep_get_remote_plugin_version();
-
-    if ($ep_remote_version && version_compare(EP_VERSION, $ep_remote_version, '<')) {
-        $ep_plugin_data = get_plugin_data(EP_FILE);
-        $ep_slug = plugin_basename(EP_FILE);
-
-        $ep_transient->response[$ep_slug] = (object) [
-            'slug' => $ep_slug,
-            'new_version' => $ep_remote_version,
-            'url' => 'https://github.com/kerackdiaz/El_PomarCoreWP',
-            'package' => 'https://github.com/kerackdiaz/El_PomarCoreWP/archive/refs/tags/V' . $ep_remote_version . '.zip',
-        ];
+    public function set_plugin_properties() {
+        $this->plugin = get_plugin_data($this->file);
+        $this->basename = plugin_basename($this->file);
+        $this->active = is_plugin_active($this->basename);
     }
 
-    return $ep_transient;
+    private function get_repository_info() {
+        if (is_null($this->github_response)) {
+            $request_uri = sprintf('https://api.github.com/repos/%s/%s/releases/latest', 
+                $this->github_user, $this->github_repo);
+
+            $args = array();
+            if ($this->access_token) {
+                $args['headers'] = array(
+                    'Authorization' => "token {$this->access_token}"
+                );
+            }
+
+            $response = wp_remote_get($request_uri, $args);
+
+            if (is_wp_error($response)) {
+                return false;
+            }
+
+            $response = json_decode(wp_remote_retrieve_body($response));
+            
+            if (is_object($response)) {
+                $this->github_response = $response;
+            }
+        }
+    }
+
+    public function check_update($transient) {
+        if (empty($transient->checked)) {
+            return $transient;
+        }
+
+        $this->get_repository_info();
+
+        if (!empty($this->github_response)) {
+            $version = str_replace('v', '', $this->github_response->tag_name);
+
+            if (version_compare($version, $this->plugin['Version'], '>')) {
+                $plugin = array(
+                    'url' => $this->plugin["PluginURI"],
+                    'slug' => current(explode('/', $this->basename)),
+                    'package' => $this->github_response->zipball_url,
+                    'new_version' => $version
+                );
+
+                $transient->response[$this->basename] = (object) $plugin;
+            }
+        }
+
+        return $transient;
+    }
+
+    public function plugin_popup($result, $action, $args) {
+        if ($action !== 'plugin_information') {
+            return false;
+        }
+
+        if (!isset($args->slug) || $args->slug != current(explode('/', $this->basename))) {
+            return false;
+        }
+
+        $this->get_repository_info();
+
+        if (!empty($this->github_response)) {
+            $plugin = array(
+                'name'              => $this->plugin["Name"],
+                'slug'              => $this->basename,
+                'version'           => str_replace('v', '', $this->github_response->tag_name),
+                'author'            => $this->plugin["AuthorName"],
+                'author_profile'    => $this->plugin["AuthorURI"],
+                'last_updated'      => $this->github_response->published_at,
+                'homepage'          => $this->plugin["PluginURI"],
+                'short_description' => $this->plugin["Description"],
+                'sections'          => array(
+                    'Description'   => $this->plugin["Description"],
+                    'Updates'       => $this->github_response->body,
+                ),
+                'download_link'     => $this->github_response->zipball_url
+            );
+
+            return (object) $plugin;
+        }
+
+        return $result;
+    }
+
+    public function after_install($response, $hook_extra, $result) {
+        global $wp_filesystem;
+
+        $install_directory = plugin_dir_path($this->file);
+        $wp_filesystem->move($result['destination'], $install_directory);
+        $result['destination'] = $install_directory;
+
+        if ($this->active) {
+            activate_plugin($this->basename);
+        }
+
+        return $result;
+    }
 }
 
-function ep_get_remote_plugin_version() {
-    $ep_remote_info = wp_remote_get('https://raw.githubusercontent.com/kerackdiaz/El_PomarCoreWP/main/README.md');
-    if (is_wp_error($ep_remote_info) || wp_remote_retrieve_response_code($ep_remote_info) != 200) {
-        return false;
-    }
-
-    $ep_remote_info = wp_remote_retrieve_body($ep_remote_info);
-    if (preg_match('/^Stable tag:\s*(\d+\.\d+\.\d+)/m', $ep_remote_info, $ep_matches)) {
-        return $ep_matches[1];
-    }
-
-    return false;
-}
-
-function ep_plugin_api_call($ep_default, $ep_action, $ep_args) {
-    if ($ep_action != 'plugin_information') {
-        return false;
-    }
-
-    if ($ep_args->slug != plugin_basename(EP_FILE)) {
-        return false;
-    }
-
-    $remote_info = wp_remote_get('https://raw.githubusercontent.com/kerackdiaz/El_PomarCoreWP/main/README.md');
-    if (is_wp_error($remote_info) || wp_remote_retrieve_response_code($remote_info) != 200) {
-        return false;
-    }
-
-    $remote_info = wp_remote_retrieve_body($remote_info);
-
-    $plugin_info = [
-        'name' => 'El Pomar Core',
-        'slug' => plugin_basename(EP_FILE),
-        'version' => ep_get_remote_plugin_version(),
-        'author' => 'Inclup',
-        'homepage' => 'https://github.com/kerackdiaz/El_PomarCoreWP',
-        'sections' => [
-            'description' => 'Este plugin es exclusivo para la administración y venta de productos de Leches El Pomar.',
-        ],
-        'download_link' => 'https://github.com/kerackdiaz/El_PomarCoreWP/archive/refs/tags/V' . ep_get_remote_plugin_version() . '.zip',
-    ];
-
-    return (object) $plugin_info;
-}
+// Inicializar el actualizador
+$updater = new El_Pomar_GitHub_Updater(__FILE__);

@@ -41,7 +41,7 @@ function el_pomar_register_news_post_type() {
         'show_in_menu'       => false,
         'show_in_admin_bar'  => true,
         'query_var'          => true,
-        'rewrite'            => array('slug' => 'news'),
+        'rewrite'            => array('slug' => 'noticias'),
         'capability_type'    => 'post',
         'has_archive'        => true,
         'hierarchical'       => false,
